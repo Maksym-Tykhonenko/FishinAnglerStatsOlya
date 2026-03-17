@@ -105,7 +105,7 @@ export default function RootNavigator() {
     }
   };
 }, []);
-//  && isInstallConversionDone, isInstallConversionDone
+//  , isInstallConversionDone.  && isInstallConversionDone
   useEffect(() => {
   const finalizeProcess = async () => {
     if (!isWebFlowEnabled) return;
