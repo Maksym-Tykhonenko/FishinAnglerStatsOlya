@@ -1,0 +1,53 @@
+workflows:
+  sample-workflow:
+    name: Fishine Angler Stats
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: FishineAnglerStatsApiKeyNew
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.bemaserves.vetikolesiv
+      vars:
+        APP_STORE_APPLE_ID: 6760334920
+        BUNDLE_ID: 'com.bemaserves.vetikolesiv'
+        XCODE_WORKSPACE: 'FishinAnglerStats.xcworkspace'
+        XCODE_SCHEME: 'FishinAnglerStats'
+    scripts:
+      - name: Install node modules
+        script: |
+          npm install
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios && pod install
+      - name: Set up provisioning profile settings on  Xcode project
+        script: |
+          cd ios
+          xcode-project use-profiles
+      - name: Increment build number
+        script: |
+          #!/bin/sh
+          cd $CM_BUILD_DIR/ios
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+      - name: Set Info.plist values
+        script: |
+          PLIST=$CM_BUILD_DIR/ios/AwesomeProject/Info.plist
+          PLIST_BUDDY=/usr/libexec/PlistBuddy
+          $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_app_store: true
+        copyright: Sara Lentini
